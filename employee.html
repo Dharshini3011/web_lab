@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="Myapp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Management</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background-color: #eef2f3;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+   
+      padding: 10px;
+      border-radius: 8px;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 8px;
+      margin: 5px;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+      font-size: 14px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    input:focus {
+      border-color: #4c6ef5;
+      box-shadow: 0 0 4px #4c6ef5;
+    }
+
+    button {
+      padding: 8px 14px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4c6ef5;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #5a7dfc;
+    }
+
+    table {
+      margin: 20px auto;
+      width: 70%;
+      border-collapse: collapse;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th {
+      
+      
+      padding: 10px;
+      text-transform: uppercase;
+    }
+
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    
+   
+    td button:last-child:hover {
+      background-color: #ff6b81;
+    }
+  </style>
+</head>
+
+<body ng-controller="Empctrl">
+  <h1>Employee Management</h1><br>
+  <input type="text" ng-model="newemp.name" placeholder="Employee Name">
+  <input type="text" ng-model="newemp.role" placeholder="Role">
+  <button ng-click="addemp()">Add Employee</button>
+
+  <table>
+    <tr>
+      <th>Name</th>
+      <th>Role</th>
+      <th>Action</th>
+    </tr>
+    <tr ng-repeat="emp in emplist">
+      <td><input ng-model="emp.name"></td>
+      <td><input ng-model="emp.role"></td>
+      <td>
+        <button ng-click="editemp(emp)">Edit</button>
+        <button ng-click="delemp(emp)">Delete</button>
+      </td>
+    </tr>
+  </table>
+
+  <script>
+    var app = angular.module("Myapp", []);
+    app.controller("Empctrl", function($scope, $http) {
+      function load() {
+        $http.get("/emp").then(function(res) {
+          $scope.emplist = res.data;
+        });
+      }
+      load();
+
+      $scope.addemp = function() {
+        $http.post("/emp", $scope.newemp).then(function(res) {
+          load();
+          $scope.newemp = {};
+        });
+      }
+
+      $scope.editemp = function(emp) {
+        $http.put("/emp/" + emp._id, emp).then(function(res) {
+          load();
+        });
+      }
+
+      $scope.delemp = function(emp) {
+        $http.delete("/emp/" + emp._id).then(function(res) {
+          load();
+        });
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="Myapp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"> 
+
+    </script>
+
+    <title>Student</title>
+</head>
+<body ng-controller="myctrl">
+    <h1>Student</h1>
+    <div ng-repeat="s in students">
+        <student data="s"></student>
+    </div>
+</body>
+<script>
+    var app=angular.module("Myapp",[]);
+    app.service("Studentservice",function(){
+        var s=[{name:"shiv",marks:99},
+            {name:"sam",marks:43}]
+        
+       this.getStudents=function(){
+        return s;
+      }
+    })
+    app.filter("grade",function(){
+        return function(marks){
+            if(marks>90){
+                return "Distinction";
+            }
+            if(marks>40){
+                return "pass";
+            }
+            return "fail";
+        }
+    })
+    app.controller("myctrl",function(Studentservice,$scope){
+         $scope.students=Studentservice.getStudents();
+    })
+    app.directive("student",function(){
+        return{
+        scope:{data : '='},
+        template:`<div>
+            <h2>{{data.name}} - {{data.marks|grade}} </h2>
+           </div>`
+
+        }
+    })
+</script>
+</html>

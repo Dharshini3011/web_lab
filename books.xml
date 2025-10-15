@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="books.xsl"?>
+
+<books>
+    <book isbn="978-0134685991">
+        <title>Effective Java</title>
+        <author>Joshua Bloch</author>
+        <price>120</price>
+    </book>
+    <book isbn="978-1491950357">
+        <title>Learning Python</title>
+        <author>Mark Lutz</author>
+        <price>100</price>
+    </book>
+    <book isbn="978-0596009205">
+        <title>Head First Java</title>
+        <author>Kathy Sierra</author>
+        <price>100</price>
+    </book>
+    <book isbn="978-0321356680">
+        <title>Java Concurrency in Practice</title>
+        <author>Brian Goetz</author>
+        <price>150</price>
+    </book>
+</books>
