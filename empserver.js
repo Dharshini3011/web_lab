@@ -5,7 +5,7 @@ var app=express();
 app.use(express.json());
 app.use(express.static(__dirname));
 
-mongoose.connect('mongodb://127.0.0.1:27017/employee');
+mongoose.connect("mongodb://127.0.0.1:27017/testdb");
 
 var emp=mongoose.model('Emp',{name:String,role:String});
 

@@ -7,7 +7,7 @@ import time
 
 URL = "http://localhost:3000/employee.html"  
 # Path to your chromedriver.exe
-service = Service("D:\\angularjs\\model-lab\\employee\\chromedriver-win64\\chromedriver.exe")
+service = Service(r"D:\web terminal\web_lab\chromedriver-win64\chromedriver.exe")
 
 # Initialize Chrome WebDriver
 driver = webdriver.Chrome(service=service)

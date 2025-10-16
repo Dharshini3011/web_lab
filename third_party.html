@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App Jugaad</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #00c6ff; 
+            background: linear-gradient(to right, #0072ff, #00c6ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            width: 300px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            margin-bottom: 15px;
+        }
+
+        input, button {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            cursor: pointer;
+            background: #0072ff;
+            color: white;
+            border: none;
+        }
+
+        button:hover {
+            background: #00c6ff;
+        }
+
+        #result {
+            margin-top: 15px;
+        }
+
+        p {
+            margin: 5px 0;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Weather</h1>
+        <input type="text" id="city" placeholder="Enter city name">
+        <button onclick="getWeather()">Check</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function getWeather() {
+            const city = document.getElementById("city").value.trim();
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "";
+
+            if (!city) {
+                resultDiv.innerHTML = "<p class='error'>Please enter a city name.</p>";
+                return;
+            }
+
+            try {
+                // Using wttr.in free API (no API key required)
+                const response = await fetch(`https://wttr.in/${city}?format=j1`);
+                if (!response.ok) throw new Error("City not found");
+
+                const data = await response.json();
+                const current = data.current_condition[0];
+
+                resultDiv.innerHTML = `
+                    <p><strong>City:</strong> ${city}</p>
+                    <p><strong>Temperature:</strong> ${current.temp_C}°C</p>
+                    <p><strong>Weather:</strong> ${current.weatherDesc[0].value}</p>
+                    <p><strong>Humidity:</strong> ${current.humidity}%</p>
+                    <p><strong>Wind:</strong> ${current.windspeedKmph} km/h</p>
+                `;
+            } catch (err) {
+                resultDiv.innerHTML = `<p class='error'>${err.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
