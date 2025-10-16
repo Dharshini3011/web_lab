@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html ng-app="examApp">
+<head>
+<meta charset="UTF-8">
+<title>AngularJS Exam Template</title>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-animate.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-route.js"></script>
+
+<script>
+// Module
+angular.module('examApp', ['ngAnimate', 'ngRoute'])
+.constant('API_URL', 'http://localhost:3000/api/books')
+.value('defaultGenre', 'Fiction')
+
+// Custom Filter
+.filter('priceFilter', function() {
+    return function(books, minPrice) {
+        return books.filter(book => book.price >= minPrice);
+    }
+})
+
+// Factory
+.factory('BookFactory', function($http, API_URL) {
+    return {
+        getBooks: () => $http.get(API_URL),
+        addBook: (book) => $http.post(API_URL, book),
+        updateBook: (book) => $http.put(`${API_URL}/${book._id}`, book),
+        deleteBook: (id) => $http.delete(`${API_URL}/${id}`)
+    };
+})
+
+// Service
+.service('BookService', function(BookFactory) {
+    this.loadBooks = BookFactory.getBooks;
+    this.addBook = BookFactory.addBook;
+    this.updateBook = BookFactory.updateBook;
+    this.deleteBook = BookFactory.deleteBook;
+})
+
+// Controller
+.controller('BookController', function($scope, BookService, defaultGenre, $timeout, $rootScope) {
+    $scope.books = [];
+    $scope.newBook = {genre: defaultGenre, available: true};
+    $scope.minPrice = 0;
+
+    $scope.loadBooks = function() {
+        BookService.loadBooks().then(res => $scope.books = res.data);
+    };
+
+    $scope.addBook = function() {
+        BookService.addBook($scope.newBook).then(() => {
+            $scope.newBook = {genre: defaultGenre, available: true};
+            $scope.loadBooks();
+        });
+    };
+
+    $scope.editBook = function(book) {
+        const newTitle = prompt("Edit Title", book.title);
+        if(newTitle) {
+            book.title = newTitle;
+            BookService.updateBook(book).then(() => $scope.loadBooks());
+        }
+    };
+
+    $scope.deleteBook = function(id) {
+        if(confirm("Are you sure?")) {
+            BookService.deleteBook(id).then(() => $scope.loadBooks());
+        }
+    };
+
+    $scope.toggleAvailability = function(book) {
+        book.available = !book.available;
+        BookService.updateBook(book).then(() => $scope.loadBooks());
+    };
+
+    // Broadcast example
+    $scope.$on('refreshBooks', function() {
+        $scope.loadBooks();
+    });
+
+    $scope.loadBooks();
+})
+
+// Custom Directive
+.directive('highlightRow', function() {
+    return {
+        restrict: 'A',
+        link: function(scope, element) {
+            element.on('mouseenter', () => element.css('background-color', '#f9f9f9'));
+            element.on('mouseleave', () => element.css('background-color', ''));
+        }
+    };
+})
+
+// Routing (example)
+.config(function($routeProvider) {
+    $routeProvider
+    .when('/books', {
+        template: `
+        <h2>All Books</h2>
+        <input type="number" ng-model="minPrice" placeholder="Min Price">
+        <table>
+            <tr><th>Title</th><th>Author</th><th>Price</th><th>Genre</th><th>Available</th><th>Actions</th></tr>
+            <tr ng-repeat="book in books | priceFilter:minPrice" highlight-row>
+                <td>{{book.title | uppercase}}</td>
+                <td>{{book.author}}</td>
+                <td>{{book.price | currency}}</td>
+                <td>{{book.genre}}</td>
+                <td>{{book.available ? 'Yes' : 'No'}}</td>
+                <td>
+                    <button ng-click="editBook(book)">Edit</button>
+                    <button ng-click="deleteBook(book._id)">Delete</button>
+                    <button ng-click="toggleAvailability(book)">Toggle Availability</button>
+                </td>
+            </tr>
+        </table>
+        `
+    })
+    .otherwise({redirectTo: '/books'});
+});
+</script>
+<style>
+table {border-collapse: collapse; width: 80%; margin-top: 20px;}
+th, td {border: 1px solid black; padding: 8px; text-align: left;}
+th {background-color: #ddd;}
+button {margin: 2px;}
+</style>
+</head>
+<body ng-controller="BookController">
+
+<h1>AngularJS Full Feature Template</h1>
+<form ng-submit="addBook()">
+    <input type="text" ng-model="newBook.title" placeholder="Title" required>
+    <input type="text" ng-model="newBook.author" placeholder="Author" required>
+    <input type="number" ng-model="newBook.price" placeholder="Price" required>
+    <input type="text" ng-model="newBook.genre" placeholder="Genre">
+    <label>
+        Available: <input type="checkbox" ng-model="newBook.available">
+    </label>
+    <button type="submit">Add Book</button>
+</form>
+
+<div ng-view></div>
+
+</body>
+</html>
